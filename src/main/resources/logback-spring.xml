@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <property name="diskStore" value="/home/logs/routing" />
+    <property name="maxFileSize" value="10MB" />
+    <property name="pattern" value="%date %level [%thread] %10logger [%file:%line],%msg%n" />
+    <property name="pattern_simple" value="%date [%file:%line] %msg%n" />
+    <property name="pattern_color" value="%black(控制台-) %red(%d{yyyy-MM-dd HH:mm:ss}) %green([%thread]) %highlight(%-5level) %boldMagenta(%logger:%line) - %cyan(%msg%n)"/>
+
+
+    <!--<conversionRule conversionWord="userId" converterClass="com.seek.mall.core.log.LogConventer" />-->
+    <!--扩展的日志类型-->
+    <!--<property name="pattern_ext" value="%date %level [%thread] %10logger [%file:%line] %msg%n -[%userName] [%userId] "/>-->
+    <!-- ==========================================root[begin]========================================== -->
+    <!-- root设置 -->
+    <property name="fileNamePattern_root_info" value="${diskStore}/%d{yyyy/MM/dd}/info_%i.log" />
+    <property name="fileNamePattern_root_warn" value="${diskStore}/%d{yyyy/MM/dd}/warn_%i.log" />
+    <property name="fileNamePattern_root_error" value="${diskStore}/%d{yyyy/MM/dd}/error_%i.log" />
+    <property name="pattern_root" value="%date %level [%thread] %10logger [%file:%line] %msg%n" />
+    <property name="pattern_monitor" value="${diskStore}/%d{yyyy/MM/dd}/monitor_%i.log" />
+
+    <!--root日志文件模式设置：按指定文件大小分割-->
+    <!-- INFO日志 -->
+    <appender name="DailyFile_INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${fileNamePattern_root_info}</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>${maxFileSize}</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <!--<layout class="org.apache.log4j.PatternLayout">-->
+        <!--<patter name="ConversionPattern" value="%date %level [%thread] %10logger [%file:%line] %msg%n -X%{userName} X%{userId} "></patter>-->
+        <!--</layout>-->
+        <encoder>
+            <pattern>${pattern_color}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name ="ASYNC_INFO" class= "ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold >0</discardingThreshold>
+        <queueSize>512</queueSize>
+        <appender-ref ref ="DailyFile_INFO"/>
+    </appender>
+
+    <!-- WARN日志 -->
+    <appender name="DailyFile_WARN" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${fileNamePattern_root_warn}</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>${maxFileSize}</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${pattern_color}</pattern>
+        </encoder>
+    </appender>
+    <!-- ERROR日志 -->
+    <appender name="DailyFile_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${fileNamePattern_root_error}</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>${maxFileSize}</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${pattern_color}</pattern>
+        </encoder>
+    </appender>
+    <!-- 自定义监控日志 -->
+    <appender name="file_monitor" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!-- level根据项目配置级别调整 -->
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${pattern_monitor}</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>64MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%date [%thread] %-5level %logger{80} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <!-- 自定义监控日志异步输出 -->
+    <appender name ="async_monitor" class= "ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold >0</discardingThreshold>
+        <queueSize>512</queueSize>
+        <appender-ref ref ="file_monitor"/>
+    </appender>
+
+    <!--root控制台模式设置-->
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <!--<filter class="ch.qos.logback.classic.filter.LevelFilter">-->
+        <!--<level>debug</level>-->
+        <!--<onMatch>ACCEPT</onMatch>-->
+        <!--<onMismatch>DENY</onMismatch>-->
+        <!--</filter>-->
+        <encoder>
+            <pattern>${pattern_color}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="DailyFile_test_INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${diskStore}/%d{yyyy/MM/dd}/test_info_%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${pattern}</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.seek.mall.api.controller" additivity="false">
+        <appender-ref ref="async_monitor"/>
+    </logger>
+    <!-- root日志记录配置，上测试、预发布、生产时候去掉Console模式 -->
+    <root level="INFO">
+        <!--<appender-ref ref="ASYNC_INFO" />-->
+        <appender-ref ref="DailyFile_WARN" />
+        <appender-ref ref="DailyFile_ERROR" />
+        <appender-ref ref="DailyFile_test_INFO" />
+        <appender-ref ref="Console" />
+    </root>
+</configuration>

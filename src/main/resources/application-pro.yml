@@ -1,0 +1,16 @@
+server:
+  port: 8089
+
+#项目名  项目规则
+config-project:
+  projects:
+    - name: "ph"
+      rule: "091"
+      prefix: "http://127.0.0.1:8080/loan"
+    - name: "sala"
+      rule: "092"
+      prefix: "http://127.0.0.1:8081/salafee"
+
+#skypay的key
+skypay:
+  encryptKey: "536536E315EF48B9"
